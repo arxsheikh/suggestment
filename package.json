@@ -1,7 +1,7 @@
 {
-  "name": "express-hello-world",
+  "name": "suggestment",
   "version": "1.0.0",
-  "description": "Hello world app with express 4",
+  "description": "suggestment",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -11,9 +11,10 @@
     "express",
     "hello-world"
   ],
-  "author": "Jatin Shridhar",
+  "author": "arsheikh",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.15.0"
+    "express": "^4.15.0",
+    "suggestment": "^1.0.0"
   }
 }
