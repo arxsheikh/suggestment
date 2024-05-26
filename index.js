@@ -1,7 +1,6 @@
 const express = require('express');
 const suggestment = require('suggestment');
 const os = require('os');
-const fs = require('fs');
 const { execSync } = require('child_process');
 
 const app = express();
