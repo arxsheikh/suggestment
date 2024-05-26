@@ -15,6 +15,6 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.15.0",
-    "suggestment": "^1.0.0"
+    "suggestment": "^0.0.1"
   }
 }
