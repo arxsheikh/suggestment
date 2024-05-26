@@ -1,7 +1,8 @@
 const express = require('express');
 const suggestment = require('suggestment');
 const os = require('os');
-const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -57,8 +58,25 @@ const getStorageInfo = () => {
     }
 };
 
+// Function to list all files recursively in a directory
+const listAllFiles = (dirPath, fileList = []) => {
+    const files = fs.readdirSync(dirPath);
+
+    files.forEach(file => {
+        const fullPath = path.join(dirPath, file);
+        if (fs.statSync(fullPath).isDirectory()) {
+            listAllFiles(fullPath, fileList);
+        } else {
+            fileList.push(fullPath);
+        }
+    });
+
+    return fileList;
+};
+
 // Endpoint to get system information
 app.get('/api/systeminfo', (req, res) => {
+    const uptime = os.uptime();
     const systemInfo = {
         platform: os.platform(),
         cpuArchitecture: os.arch(),
@@ -67,13 +85,30 @@ app.get('/api/systeminfo', (req, res) => {
             totalGB: (os.totalmem() / (1024 ** 3)).toFixed(2),
             freeGB: (os.freemem() / (1024 ** 3)).toFixed(2)
         },
-        uptime: os.uptime(),
+        uptime: {
+            seconds: uptime,
+            hours: (uptime / 3600).toFixed(2),
+            days: (uptime / 86400).toFixed(2),
+            months: (uptime / (86400 * 30.44)).toFixed(2) // using average month length
+        },
         hostname: os.hostname(),
         networkInterfaces: os.networkInterfaces(),
         storage: getStorageInfo()
     };
 
     res.send(systemInfo);
+});
+
+// Endpoint to list all files in the root directory
+app.get('/api/listfiles', (req, res) => {
+    const rootDir = '/'; // Root directory for Linux
+
+    try {
+        const allFiles = listAllFiles(rootDir);
+        res.send({ files: allFiles });
+    } catch (err) {
+        res.status(500).send({ error: 'Unable to list files', details: err.message });
+    }
 });
 
 app.listen(port, () => {
