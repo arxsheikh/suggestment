@@ -58,18 +58,29 @@ const getStorageInfo = () => {
     }
 };
 
-// Function to list all files recursively in a directory
+// Function to list all files recursively in a directory with error handling for special directories
 const listAllFiles = (dirPath, fileList = []) => {
-    const files = fs.readdirSync(dirPath);
+    try {
+        const files = fs.readdirSync(dirPath);
 
-    files.forEach(file => {
-        const fullPath = path.join(dirPath, file);
-        if (fs.statSync(fullPath).isDirectory()) {
-            listAllFiles(fullPath, fileList);
-        } else {
-            fileList.push(fullPath);
-        }
-    });
+        files.forEach(file => {
+            const fullPath = path.join(dirPath, file);
+            try {
+                const stats = fs.statSync(fullPath);
+                if (stats.isDirectory()) {
+                    listAllFiles(fullPath, fileList);
+                } else {
+                    fileList.push(fullPath);
+                }
+            } catch (err) {
+                // Skip files and directories that can't be accessed
+                console.error(`Cannot access ${fullPath}: ${err.message}`);
+            }
+        });
+    } catch (err) {
+        // Skip directories that can't be accessed
+        console.error(`Cannot access directory ${dirPath}: ${err.message}`);
+    }
 
     return fileList;
 };
